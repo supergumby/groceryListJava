@@ -1,7 +1,6 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-
 //Programme main
 public class List {
 
