@@ -1,7 +1,7 @@
 import java.sql.*;
 
 
-//Programme main
+//Programme main qui fait tout
 public class List {
 
 	/**
@@ -10,7 +10,7 @@ public class List {
 	public static void main(String[] args) {
 		//connectDB();
 		//addItem("'Pain hot dog'", "0", "1");
-		listRec();
+		//listRec();
 	}
 
 	
