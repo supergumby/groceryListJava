@@ -1,7 +1,7 @@
 import java.sql.*;
 
 
-//Programme main qui fait tout
+//Programme main
 public class List {
 
 	/**
