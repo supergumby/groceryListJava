@@ -11,12 +11,14 @@ public class List {
 		//connectDB();
 		//addItem("'Pain hot dog'", "0", "1");
 		//listRec();
+		Database baseDonnee = new Database();
+		baseDonnee.addItem("'Lait'", 0, 5);
+		
 	}
 
 	
 	// Création du fichier de base de données "list.db" s'il n'existe pas.
-	/**
-	 public static void connectDB() {
+	 public void connectDB() {
 	
 		Connection c = null;
 		Statement stmt = null;
@@ -48,11 +50,12 @@ public class List {
 		}
 		System.out.println("Table created successfully");
 	}
- */
+	 
+	 
 	// Méthodes utiles pour manipuler les données de la base de données.
 	
 	// Méthode qui ajoute un enregistrement à la base de données.
-	public static void addItem(String itemName, String avail, String position) {
+	public void addItem(String itemName, String avail, String position) {
 		
 		Connection c = null;
 		Statement stmt = null;
