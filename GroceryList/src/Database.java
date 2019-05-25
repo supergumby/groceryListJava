@@ -1,91 +1,105 @@
 import java.sql.*;
 
+
 /*Contient les méthodes de manipultation des données de la table "List"
 de la base de données.*/
 
 public class Database {
 	
-	private Connection c = null;
-	private Statement stmt = null;
+	private String DBPath = "Chemin aux base de donnée SQLite";
+	private Connection connection = null;
+	private Statement statement = null;	
 	
 	/**
-	 *	Constructeur d'objet base de données 
+	 *	Constructeur d'objet base de données
 	 */
-	public Database() {
-		
-
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:list.db");
-
-		} catch (Exception e) {
-			System.err.println(e.getClass().getName()+ ": " + e.getMessage());
-			System.exit(0);
-		}
-		System.out.println("Opened database successfully");
-
-	/*// Création de la table d'item "items" dans le fichier de base de données "list.db" s'il n'existe pas.
-		try {
-			stmt = c.createStatement();
-			String sql = "CREATE TABLE ITEMS " +
-					"(ID 				INTEGER PRIMARY KEY AUTOINCREMENT, " +
-					" ITEMNAME 			TEXT NOT NULL, " +
-					" AVAILABILITY 		INT, " +
-					" POSITION 			INT)";
-			stmt.executeUpdate(sql);
-			stmt.close();
-			c.close();
-		} catch (Exception e) {
-			System.err.println(e.getClass().getName() +": " + e.getMessage());
-			System.exit(0);
-		}
-		System.out.println("Table created successfully"); */
-	}
+	public Database(String dBPath) {
+		DBPath = dBPath;
+	}	
 	
 	
-	/*
-	* Méthode qui ajoute un enregistrement à la base de données.
-	*/
-	public void addItem(String itemName, int avail, int position) {
-		Connection c = null;
-		Statement stmt = null;
+	/**
+	 *	Création de la connexion vers la base de données identifiée dans le constructeur.
+	 */
+	public void connect() {
 		
 		try {
 			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:list.db");
-			c.setAutoCommit(false);
-			System.out.println("Opened database successfully");
+			connection = DriverManager.getConnection("jdbc:sqlite:" + DBPath);
+			statement = connection.createStatement();
+			System.out.println("Connexion à " + DBPath + " avec succès");
 			
-			stmt = c.createStatement();
-			String sql = "INSERT INTO ITEMS (ITEMNAME,AVAILABILITY,POSITION) " +
-						"VALUES (itemName, avail, position);";
-			stmt.executeUpdate(sql);
-			stmt.close();
-			c.commit();
-			c.close();
+		}	catch (ClassNotFoundException notFoundException) {
+				notFoundException.printStackTrace();
+				System.out.println("Erreur de connexion");
+				
+			} catch (SQLException sqlException) {
+				sqlException.printStackTrace();
+				System.out.println("Erreur de connexion");
+			}
+	}
+	
+	/**
+	 * 	Fermeture de la base de données.
+	 */
+	public void close() {
+		try {
+			statement.close();
+			connection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-		catch (Exception e){
-			System.err.println(e.getClass().getName() + ": " + e.getMessage());
-			System.exit(0);
-		}
-		System.out.println("Records created successfully");
 	}
 	
 	
-	// Méthode qui affiche les enregistrements de la table "items" de la base de données "list.db".
+	/**
+	 * Obtention du résultat d'une requête interrogeant la base de données.
+	 * @param requete
+	 * @return Le résultat d'une requête SQL sous la forme d'un ResultSet
+	 */
+	public ResultSet query(String requete) {
+		ResultSet resultat = null;
+		try {
+			resultat = statement.executeQuery(requete);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Erreur dans la requet : " + requete);
+		}
+		return resultat;
+
+	}
+	
+	/**
+	 * Ajout d'un objet item à la liste d'items de la base de données.
+	 * @param item
+	 */
+	public void addItem(Item item) {
+		
+		try {
+			connection = DriverManager.getConnection("jdbc:sqlite:" + DBPath);
+			statement = connection.createStatement();
+			statement.executeUpdate("INSERT INTO ITEMS (ITEMNAME, AVAILABILITY, POSITION)"
+					+ " VALUES('" + item.getItemName() + "' ," +
+					item.getItemAvailability() + " ," + item.getItemPosition() + ")");
+			System.out.println("Insertion avec Succès");
+			System.out.println();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	
+	/**
+	 * Méthode qui affiche les enregistrements de la table "items" de la base de données "list.db".
+	 */
 		public void listRec() {
 			
-			Connection c = null;
-			Statement stmt = null;
-			
 			try {
-				Class.forName("org.sqlite.JDBC");
-				c = DriverManager.getConnection("jdbc:sqlite:list.db");
-				c.setAutoCommit(false);
-				System.out.println("Opened databse successfully");
 				
-				stmt = c.createStatement();
-				ResultSet rs = stmt.executeQuery("SELECT * FROM ITEMS;");
+				ResultSet rs = statement.executeQuery("SELECT * FROM ITEMS;");
 				
 				while (rs.next()) {
 					int id = rs.getInt("id");
@@ -101,14 +115,34 @@ public class Database {
 				}
 				
 				rs.close();
-				stmt.close();
-				c.close();		
+					
 			}
 			catch (Exception e){
 				System.err.println(e.getClass().getName() + ": " + e.getMessage());
 				System.exit(0);
 			}
+			
 			System.out.println("Operation done successfully");
 		}
-
+		
+	// PAS REQUIS SI ON PREND POUR ACQUIS QUE LA TABLE EXISTE DÉJÀ AU DÉPART	
+		/*// Création de la table d'item "items" dans le fichier de base de données "list.db" s'il n'existe pas.
+			try {
+				stmt = c.createStatement();
+				String sql = "CREATE TABLE ITEMS " +
+						"(ID 				INTEGER PRIMARY KEY AUTOINCREMENT, " +
+						" ITEMNAME 			TEXT NOT NULL, " +
+						" AVAILABILITY 		INT, " +
+						" POSITION 			INT)";
+				stmt.executeUpdate(sql);
+				stmt.close();
+				c.close();
+			} catch (Exception e) {
+				System.err.println(e.getClass().getName() +": " + e.getMessage());
+				System.exit(0);
+			}
+			System.out.println("Table created successfully");
+		}*/
+		
+		
 }

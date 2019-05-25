@@ -5,9 +5,12 @@ public class List {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Database baseDonnee = new Database();
-		baseDonnee.addItem("'Lait'", 0, 5);
+		
+		Database baseDonnee = new Database("list.db");
+		Item item = new Item("Lait", 1, 1);
+		baseDonnee.addItem(item);
 		baseDonnee.listRec();
+		baseDonnee.close();
 		
 	}
 	 
